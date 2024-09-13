@@ -1,0 +1,24 @@
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import com.example.demo.model.Users;
+import com.example.demo.service.UserService;
+
+public class UserRestController {
+	
+	@Autowired
+	private UserService service;
+	
+	@PostMapping("/api/member/join")
+	public ResponseEntity<String> join(@ModelAttribute Users users) {
+		service.join(users);
+		return ResponseEntity.status(HttpStatus.OK).body(null);
+		
+	}
+
+}

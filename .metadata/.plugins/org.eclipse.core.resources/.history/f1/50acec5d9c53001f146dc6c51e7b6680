@@ -1,0 +1,29 @@
+package com.example.demo.service;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.model.Role;
+import com.example.demo.model.Users;
+import com.example.demo.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Service
+public class UserService {
+	
+	private UserRepository repository;
+	private PasswordEncoder bCryptPassEncoder;
+	
+	// 회원가입
+	public void join(Users users) {
+		
+		users.setPassword(bCryptPassEncoder.encode(users.getPassword()));
+		users.setRole(Role.ROLE_USER);
+		
+		repository.save(users);
+		
+	}
+
+}

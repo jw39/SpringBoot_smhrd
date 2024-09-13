@@ -1,0 +1,58 @@
+package com.example.demo.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+import jakarta.servlet.DispatcherType;
+
+@Configuration // 설정파일
+@EnableWebSecurity // spring Security 활성화
+				// 내부적으로 springSecurityFilterChain 동작
+public class SecurityConfig {
+	
+	// css, js, 이미지 (정적 리소스) => 정적 리소스가 제대로 적용되지 않는 상황 발생
+	@Bean //수동으로 객체 생성
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		return (web) -> web.ignoring().requestMatchers("/static/**"); //static 폴더 안에 있는 건 활성화시키지 않겠다 라는 의미의 코드
+	}
+	
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+		http
+		.csrf(csrf -> csrf.disable()) //GET 요청 제외 다른 요청으로부터 보호, csrf 토큰 포함(토큰 없으면 위조 요청으로 판단), rest api 사용할 땐 설정할 필요 없음
+		.authorizeHttpRequests(auth -> auth
+				.dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+				.requestMatchers("/", "/join", "/login").permitAll() // 인증 없이도 접근 가능한 경로 설정
+				.requestMatchers("/admin").hasRole("ADMIN") //ADMIN 권한이 있을 때에만 접근 가능한 경로 설정
+				.anyRequest().authenticated() // 그 외 요청은 무조건 인증 확인하겠다!
+		) // 특정한 경로에 대해 인증을 허용하거나 등등등
+		.formLogin(form -> form
+				.loginPage("/login") // 로그인 페이지 설정
+				.defaultSuccessUrl("/") //로그인 성공 시 요청 url (index.jsp)
+				.failureUrl("/login") //로그인 실패 시 요청 url 
+				.permitAll()
+		)
+		.logout(logout -> logout
+				.logoutUrl("/logout") // 로그아웃 url 설정
+				.logoutSuccessUrl("/login") // 로그아웃 후 url 
+				.permitAll()
+		);
+//		.userDetailsService(null)
+		
+		return http.build();
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+}
+
+

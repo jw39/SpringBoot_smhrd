@@ -1,0 +1,18 @@
+package com.example.demo.jwt;
+
+import java.security.Key;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtUtil { // 토큰 생성, 유효한 토큰, 사용자 정보 확인
+	
+	private long accessTokenExTime;
+	private Key key; // security 사용 시 사용할 (암호화된)key
+	
+	// ExpTime, 암호화 전 key로 사용할 문자열
+	public JwtUtil() {
+		
+	}
+
+}
